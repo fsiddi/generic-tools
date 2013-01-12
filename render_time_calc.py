@@ -35,12 +35,9 @@ init info ()
 
 class Shot(object):
 	"""docstring for Shot"""
-
-	#self.__framecount = 0
 	
 	def __init__(self, render_log_file):
 		#super(Shot, self).__init__()
-		#self.arg = arg
 		render_log_file = open(render_log_file, "r").readlines()
 		for i, l in enumerate(render_log_file):
 			pass
@@ -132,17 +129,19 @@ def render_time(fname):
 	
 	return average	
 
-
+def timedelta_seconds(seconds):
+	"""Simple function for timedelta conversion"""
+	return datetime.timedelta(seconds = seconds)
 	
 def shotlist_rendertime(shots_list):
-	durations = []
-	framecounts = []
+	durations = [] # collects all shots durations
+	framecounts = [] # collects all framecounts
 	for shot in shots_list:
 		durations.append(shot.get_total_rendertime())
 		framecounts.append(shot.get_framecount())
-	one_machine_time = datetime.timedelta(seconds = sum(durations))
-	render_farm_time = datetime.timedelta(seconds = sum(durations)/RENDERFAM_NODES)
-	project_framecount = datetime.timedelta(seconds = sum(framecounts)/FRAMERATE)
+	one_machine_time = timedelta_seconds(sum(durations))
+	render_farm_time = timedelta_seconds(sum(durations)/RENDERFAM_NODES)
+	project_framecount = timedelta_seconds(sum(framecounts)/FRAMERATE)
 
 
 	print("Amount of shots ................ " + str(len(durations)))
@@ -150,11 +149,6 @@ def shotlist_rendertime(shots_list):
 	print("Total time on one machine ...... " + str(one_machine_time))
 	print("Total renderfarm time .......... " + str(render_farm_time))
 
-
-#render_time(logfile)
-#print file_len(logfile)
-#print get_average(logfile)
-#get_total_time(logfile)
 
 """
 Now we walk the filesystem and for each 'render_times.txt' we meet we
@@ -172,7 +166,3 @@ for dirpath, dirnames, filenames in os.walk(FOLDER):
 
 shotlist_rendertime(shots_list)
 
-
-		
-#print KEYWORDS
-#print counterline
