@@ -15,10 +15,63 @@ FOLDER = "/Users/fsiddi/Desktop"
 RENDERFAM_NODES = 30
 
 time_render_shots = []
+shots_list = []
+
+"""
+Class shot (render_times.tx)
+* name = str
+* path = str
+* average_rendertime = int
+* average_memory = int
+* frames_rendertime = [int]
+* frames_number = len(frames_rendertime)
+---
+init info ()
+	sets name, path, average_rendertime, average_memory
+
+
+"""
+
+class Shot(object):
+	"""docstring for Shot"""
+
+	#self.__framecount = 0
+	
+	def __init__(self, render_log_file):
+		#super(Shot, self).__init__()
+		#self.arg = arg
+		render_log_file = open(render_log_file, "r").readlines()
+		for i, l in enumerate(render_log_file):
+			pass
+		self.__framecount = i
+
+		for line in render_log_file:
+			if line.startswith('/'):
+				shot_data = line.split('|')
+				shot_full_path = shot_data[0].split('/')
+				self.__name = shot_full_path[len(shot_full_path) - 1]
+				self.__average_rendertime = timestring_to_seconds(shot_data[1])
+				self.__average_memory = float(shot_data[2].strip())
+				self.__total_rendertime = self.__average_rendertime * self.__framecount
+			else:
+				pass
+
+	def show_infos(self):
+		print (self.__framecount)
+		print (self.__name)
+		print (self.__average_rendertime)
+		print (self.__average_memory)
+		print (">> " + str(datetime.timedelta(seconds = self.__total_rendertime)))
+
+	def get_total_rendertime(self):
+		return self.__total_rendertime
 
 
 def file_len(fname):
-	"""
+	"""Count number of lines in the files
+
+	By counting the lines of each file (and ignoring the first line) we
+	obtain the number of rendered frames for that shot.
 	"""
 	for i, l in enumerate(fname):
 		pass
@@ -26,6 +79,11 @@ def file_len(fname):
 	return i
 
 def timestring_to_seconds(render_time):
+	"""Convert the time string into and integer (seconds)
+
+	Provide to the function a value like "1h, 20min, 14.8sec" and it will
+	return an integer like 3735.
+	"""
 	to_sum =[]
 	render_time = render_time.split(',')
 	
@@ -63,20 +121,20 @@ def render_time(fname):
 		if line.startswith('/'):
 			pass
 		else:
-			line = line.split('|')[1]
-			#print line
-			
-			#print render_time
-			
+			line = line.split('|')[1]		
 			#print("Rendertime is " + str(timestring_to_seconds(line)) + "sec")
 			average_list.append(timestring_to_seconds(line))
 			
 	average = sum(average_list)/len(average_list)
 	
-	#print("Average rendertime: " + str(average) + "sec aka " + str(datetime.timedelta(seconds = average)))
 	return average	
 
 def get_average(fname):
+	"""Returns average rendertime from the first line of the logfile
+
+	Returns the value as an integer by using the timestring_to_seconds
+	method to convert the time format writte in the log.
+	"""
 	for line in fname:
 		if line.startswith('/'):
 			time = timestring_to_seconds(line.split('|')[1])
@@ -85,25 +143,48 @@ def get_average(fname):
 	return time
 
 def get_total_time(fname):
+	"""Returns the rendertime of a whole shot
+
+	Multiplies the average rendertime of a frame by the number of
+	frames in the shot (delivers an integer)
+	"""
 	val = file_len(fname)*get_average(fname)
 	print("Total render time is: " + str(datetime.timedelta(seconds = val)))
 	return val
 	
+def shotlist_rendertime(shots_list):
+	durations = []
+	for shot in shots_list:
+		durations.append(shot.get_total_rendertime())
+	print datetime.timedelta(seconds = sum(durations))
+
 
 #render_time(logfile)
 #print file_len(logfile)
 #print get_average(logfile)
 #get_total_time(logfile)
 
+"""
+Now we walk the filesystem and for each 'render_times.txt' we meet we
+extract the total render time and add it to a list. In the end we 
+will sum up everything to get all the time needed to render all the
+shots in the movie
+"""
+
 for dirpath, dirnames, filenames in os.walk(FOLDER):
 	for filename in filenames:
 		if filename == 'render_times.txt':
 			fname = os.path.join(FOLDER, filename)
+			shot = Shot(fname)
+			shots_list.append(shot)
+
 			fname = open(fname, "r").readlines()
 
 			time_render_shots.append(get_total_time(fname))
 
 print (datetime.timedelta(seconds = sum(time_render_shots)))
+
+shotlist_rendertime(shots_list)
 
 
 		
