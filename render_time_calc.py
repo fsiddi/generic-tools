@@ -13,6 +13,7 @@ import os
 
 FOLDER = "/Users/fsiddi/Desktop"
 RENDERFAM_NODES = 30
+FRAMERATE = 24
 
 time_render_shots = []
 shots_list = []
@@ -66,6 +67,8 @@ class Shot(object):
 	def get_total_rendertime(self):
 		return self.__total_rendertime
 
+	def get_framecount(self):
+		return self.__framecount
 
 def file_len(fname):
 	"""Count number of lines in the files
@@ -133,10 +136,19 @@ def render_time(fname):
 	
 def shotlist_rendertime(shots_list):
 	durations = []
+	framecounts = []
 	for shot in shots_list:
 		durations.append(shot.get_total_rendertime())
-	print datetime.timedelta(seconds = sum(durations))
-	print datetime.timedelta(seconds = sum(durations)/RENDERFAM_NODES)
+		framecounts.append(shot.get_framecount())
+	one_machine_time = datetime.timedelta(seconds = sum(durations))
+	render_farm_time = datetime.timedelta(seconds = sum(durations)/RENDERFAM_NODES)
+	project_framecount = datetime.timedelta(seconds = sum(framecounts)/FRAMERATE)
+
+
+	print("Amount of shots ................ " + str(len(durations)))
+	print("Amount of movie ................ " + str(project_framecount))
+	print("Total time on one machine ...... " + str(one_machine_time))
+	print("Total renderfarm time .......... " + str(render_farm_time))
 
 
 #render_time(logfile)
@@ -157,7 +169,6 @@ for dirpath, dirnames, filenames in os.walk(FOLDER):
 			fname = os.path.join(FOLDER, filename)
 			shot = Shot(fname)
 			shots_list.append(shot)
-
 
 shotlist_rendertime(shots_list)
 
