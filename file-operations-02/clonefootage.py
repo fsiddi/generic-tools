@@ -27,8 +27,11 @@ for dirname, dirnames, filenames in os.walk(FOLDER_SRC):
 					#pass
 					os.makedirs(dirname_dst)
 				filename_dst = os.path.join(dirname_dst, filename)
-				print filename_src + " >> " + filename_dst
-				shutil.copy(filename_src, filename_dst)
+				if not os.path.exists(filename_dst):
+					print filename_src + " >> " + filename_dst
+					shutil.copy(filename_src, filename_dst)
+				else:
+					print "skipping " + filename_src
 			else:
 				pass
 			#subprocess.call(["convert", filename_src, "-resize", "1280x1280", filename_dst])

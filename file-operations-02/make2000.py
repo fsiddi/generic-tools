@@ -2,12 +2,12 @@ import subprocess
 import os
 import shutil
 
-FOLDER = "/Volumes/shared/mango/weeklies/"
-FOLDER_NEW = "/Volumes/shared/mango/weeklies_dest/"
+FOLDER = "/Volumes/render/mango/cleaned"
+FOLDER_NEW = "/Volumes/render/mango/cleaned_jpeg2000"
 
 for dirname, dirnames, filenames in os.walk(FOLDER):
     for filename in filenames:
-        if "/05-" in dirname:
+        if "/linear" in dirname:
             filename_src = os.path.join(dirname, filename)
             dirname_dst = dirname.replace(FOLDER, FOLDER_NEW)
             if filename.endswith(".png"):
@@ -22,6 +22,6 @@ for dirname, dirnames, filenames in os.walk(FOLDER):
                     os.makedirs(dirname_dst)
                 filename_dst = os.path.join(dirname_dst, filename)
                 print filename_src + " >> " + filename_dst
-                subprocess.call(["convert", filename_src, "-resize", "1280x1280", filename_dst])
+            #subprocess.call(["convert", filename_src, "-resize", "1280x1280", filename_dst])
         else:
             print "skipping " + dirname
