@@ -129,34 +129,14 @@ def render_time(fname):
 	
 	return average	
 
-def get_average(fname):
-	"""Returns average rendertime from the first line of the logfile
 
-	Returns the value as an integer by using the timestring_to_seconds
-	method to convert the time format writte in the log.
-	"""
-	for line in fname:
-		if line.startswith('/'):
-			time = timestring_to_seconds(line.split('|')[1])
-		else:
-			pass
-	return time
-
-def get_total_time(fname):
-	"""Returns the rendertime of a whole shot
-
-	Multiplies the average rendertime of a frame by the number of
-	frames in the shot (delivers an integer)
-	"""
-	val = file_len(fname)*get_average(fname)
-	print("Total render time is: " + str(datetime.timedelta(seconds = val)))
-	return val
 	
 def shotlist_rendertime(shots_list):
 	durations = []
 	for shot in shots_list:
 		durations.append(shot.get_total_rendertime())
 	print datetime.timedelta(seconds = sum(durations))
+	print datetime.timedelta(seconds = sum(durations)/RENDERFAM_NODES)
 
 
 #render_time(logfile)
@@ -178,11 +158,6 @@ for dirpath, dirnames, filenames in os.walk(FOLDER):
 			shot = Shot(fname)
 			shots_list.append(shot)
 
-			fname = open(fname, "r").readlines()
-
-			time_render_shots.append(get_total_time(fname))
-
-print (datetime.timedelta(seconds = sum(time_render_shots)))
 
 shotlist_rendertime(shots_list)
 
