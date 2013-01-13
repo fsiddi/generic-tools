@@ -160,9 +160,11 @@ shots in the movie
 for dirpath, dirnames, filenames in os.walk(FOLDER):
 	for filename in filenames:
 		if filename == 'render_times.txt':
-			fname = os.path.join(FOLDER, filename)
+			fname = os.path.join(dirpath, filename)
 			shot = Shot(fname)
 			shots_list.append(shot)
+		else:
+			pass
 
 shotlist_rendertime(shots_list)
 
